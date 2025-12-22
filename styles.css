@@ -22,16 +22,19 @@ body{
               radial-gradient(900px 500px at 80% 20%, rgba(54,211,153,.14), transparent 60%),
               linear-gradient(180deg, var(--bg1), var(--bg2));
   display:flex;
-  align-items:center;
+  align-items:flex-start;
   justify-content:center;
   padding:24px;
   -webkit-tap-highlight-color: transparent;
+  min-height:100vh;
+  overflow-y:auto;
 }
 
 .shell{
   width:min(980px, 100%);
   display:grid;
   gap:16px;
+  margin:auto 0;
 }
 
 .header{
