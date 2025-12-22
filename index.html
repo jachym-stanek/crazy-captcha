@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Vyberte všechny pštrosy</title>
+  <link rel="stylesheet" href="./styles.css"/>
+</head>
+<body>
+  <main class="shell">
+    <section class="header">
+      <div class="brand">
+        <h1>Vyberte všechny pštrosy</h1>
+        <p>
+          Myslim, že to nedáššš
+        </p>
+      </div>
+      <div class="pill" aria-live="polite">
+        <span class="dot" aria-hidden="true"></span>
+        <div>
+          <div style="font-size:12px;color:rgba(233,238,252,.82)">Progress</div>
+          <div><strong id="progressText">0 / 3</strong></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-inner">
+        <div id="grid" class="grid" aria-label="Animal selection grid"></div>
+
+        <div class="hint">
+          <div class="icon" aria-hidden="true">🧩</div>
+          <div>
+            <strong>Smrdíš</strong>
+          </div>
+        </div>
+
+        <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+        <div class="footer" style="margin-top:14px;">
+          <button id="resetBtn" class="btn secondary" type="button">Reset</button>
+          <div style="color:var(--muted);font-size:12px;">
+            Audio plays on tap/click. If you hear nothing, try tapping again (browser audio policy).
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="./puzzle1.js"></script>
+</body>
+</html>
