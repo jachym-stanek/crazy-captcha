@@ -107,7 +107,8 @@
     vcelka: "vcelka-maja.mp3",
     airhorn: "airhorn.mp3",
     ostrich: "ostrich.mp3",
-    pickle: "pickle-rick.mp3"
+    pickle: "pickle-rick.mp3",
+    boneca: "boneca.mp3"
   };
 
   // Try to play a real audio file first (better on mobile), fall back to synthesis.
@@ -168,7 +169,7 @@
       soundUrl:""
     },
     {
-      id:"bear", label:"Bear", emoji:"🐻",
+      id:"bear", label:"Burák", emoji:"🐻",
       imgUrl:"burak-foto.jpg",
       // misleading: also counts as an "ostrich" because of its sound
       soundKey:"ostrich",
@@ -188,22 +189,22 @@
       soundUrl:""
     },
     {
-      id:"cow", label:"Cow", emoji:"🐮",
+      id:"cow", label:"Monkey", emoji:"🐮",
       imgUrl:"monkey.webp",
       soundKey:"airhorn",
       soundUrl:""
     },
     {
-      id:"pig", label:"Pig", emoji:"🐷",
-      imgUrl:"https://loremflickr.com/320/320/pig?lock=15",
-      soundKey:"airhorn",
+      id:"pig", label:"Liam Neeson", emoji:"🐷",
+      imgUrl:"liam-neeson.webp",
+      soundKey:"boneca",
       soundUrl:""
     },
     { id:"ostrichA", label:"Ostrich", emoji:"🪶", imgUrl:"ostrich.webp", soundKey:"vcelka",     soundUrl:"" },
     { id:"ostrichB", label:"Ostrich", emoji:"🪶", imgUrl:"ostrich.webp", soundKey:"ostrich", soundUrl:"" },
     
     {
-      id:"lion", label:"Lion", emoji:"🦁",
+      id:"lion", label:"Burák", emoji:"🦁",
       imgUrl:"burak-foto.jpg",
       soundKey:"cat",
       soundUrl:""

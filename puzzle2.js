@@ -29,8 +29,23 @@
   }
 
   function wrongSound() {
-    tone(120, 0.18, "square", 0.10);
-    setTimeout(() => tone(90, 0.16, "square", 0.08), 140);
+    // Harsh buzzer-like sound
+    tone(120, 0.25, "sawtooth", 0.15);
+    setTimeout(() => tone(80, 0.25, "sawtooth", 0.12), 150);
+    setTimeout(() => tone(60, 0.30, "square", 0.10), 300);
+  }
+
+  function playAirhorn() {
+    try {
+      const airhorn = new Audio("airhorn.mp3");
+      airhorn.volume = 0.7;
+      airhorn.play().catch(() => {});
+    } catch {
+      // Fallback victory sound
+      tone(523, 0.15, "sine", 0.12);
+      setTimeout(() => tone(659, 0.15, "sine", 0.12), 150);
+      setTimeout(() => tone(784, 0.25, "sine", 0.15), 300);
+    }
   }
 
   function animate(el, cls) {
@@ -155,6 +170,7 @@
 
       if (progressIdx === correctOrdered.length) {
         setToast("✅ Success. Revealing content…", "ok");
+        playAirhorn();
         reveal();
       }
       return;
@@ -164,7 +180,11 @@
     wrongSound();
     animate(el, "shake");
     setToast("❌ Wrong. Progress reset and tiles shuffled.", "bad");
-    reset(true);
+    
+    // Delay before reshuffling so user can see what they clicked
+    setTimeout(() => {
+      reset(true);
+    }, 400);
   }
 
   function render() {
