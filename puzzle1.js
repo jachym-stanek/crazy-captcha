@@ -111,24 +111,23 @@
     boneca: "boneca.mp3"
   };
 
-  // Track currently playing audio to stop it when a new tile is clicked
-  let currentlyPlayingAudio = null;
+  // Track all audio instances to stop them when a new tile is clicked
+  let allTileAudios = new Set();
 
-  // Stop any currently playing tile sound
-  function stopCurrentSound() {
-    if (currentlyPlayingAudio) {
+  // Stop all currently playing tile sounds
+  function stopAllSounds() {
+    allTileAudios.forEach(audio => {
       try {
-        currentlyPlayingAudio.pause();
-        currentlyPlayingAudio.currentTime = 0;
+        audio.pause();
+        audio.currentTime = 0;
       } catch {}
-      currentlyPlayingAudio = null;
-    }
+    });
   }
 
   // Try to play a real audio file first (better on mobile), fall back to synthesis.
   function playSound(tile) {
-    // Stop any currently playing sound first
-    stopCurrentSound();
+    // Stop all currently playing sounds first
+    stopAllSounds();
 
     const fn = sounds[tile.soundKey] || sounds.cat;
 
@@ -139,14 +138,17 @@
     }
 
     try {
-      if (!tile._audio) {
-        const a = new Audio(url);
-        a.preload = "auto";
-        tile._audio = a;
-      }
-      tile._audio.currentTime = 0;
-      currentlyPlayingAudio = tile._audio;
-      const p = tile._audio.play();
+      // Always create a fresh Audio instance to avoid caching/state issues on GitHub Pages
+      const a = new Audio(url);
+      a.preload = "auto";
+      allTileAudios.add(a);
+      
+      // Clean up after playback ends
+      a.addEventListener("ended", () => {
+        allTileAudios.delete(a);
+      }, { once: true });
+      
+      const p = a.play();
       if (p && typeof p.catch === "function") p.catch(() => fn());
     } catch {
       fn();
