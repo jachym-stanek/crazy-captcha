@@ -29,10 +29,45 @@
   }
 
   function wrongSound() {
-    // Harsh buzzer-like sound
-    tone(120, 0.25, "sawtooth", 0.15);
-    setTimeout(() => tone(80, 0.25, "sawtooth", 0.12), 150);
-    setTimeout(() => tone(60, 0.30, "square", 0.10), 300);
+    // Harsh buzzer-like sound - use AudioContext timing for mobile reliability
+    const ctx = getAudio();
+    const t0 = ctx.currentTime;
+    
+    // First tone
+    const osc1 = ctx.createOscillator();
+    const g1 = ctx.createGain();
+    osc1.type = "sawtooth";
+    osc1.frequency.setValueAtTime(120, t0);
+    g1.gain.setValueAtTime(0.0001, t0);
+    g1.gain.exponentialRampToValueAtTime(0.15, t0 + 0.01);
+    g1.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.25);
+    osc1.connect(g1).connect(ctx.destination);
+    osc1.start(t0);
+    osc1.stop(t0 + 0.27);
+    
+    // Second tone at +150ms
+    const osc2 = ctx.createOscillator();
+    const g2 = ctx.createGain();
+    osc2.type = "sawtooth";
+    osc2.frequency.setValueAtTime(80, t0 + 0.15);
+    g2.gain.setValueAtTime(0.0001, t0 + 0.15);
+    g2.gain.exponentialRampToValueAtTime(0.12, t0 + 0.16);
+    g2.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.40);
+    osc2.connect(g2).connect(ctx.destination);
+    osc2.start(t0 + 0.15);
+    osc2.stop(t0 + 0.42);
+    
+    // Third tone at +300ms
+    const osc3 = ctx.createOscillator();
+    const g3 = ctx.createGain();
+    osc3.type = "square";
+    osc3.frequency.setValueAtTime(60, t0 + 0.30);
+    g3.gain.setValueAtTime(0.0001, t0 + 0.30);
+    g3.gain.exponentialRampToValueAtTime(0.10, t0 + 0.31);
+    g3.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.60);
+    osc3.connect(g3).connect(ctx.destination);
+    osc3.start(t0 + 0.30);
+    osc3.stop(t0 + 0.62);
   }
 
   function playAirhorn() {
@@ -84,6 +119,7 @@
     { id:"moon", label:"Moon",     emoji:"🌙", freq:470, pattern:"single" },
     { id:"bolt", label:"Bolt",     emoji:"⚡️", freq:520, pattern:"double" },  // correct (high)
     { id:"heart",label:"Heart",    emoji:"❤️", freq:560, pattern:"single" },
+    { id:"cloud",label:"Cloud",    emoji:"☁️", freq:600, pattern:"single" },
   ];
 
   // Correct order: by pitch (freq)
@@ -122,28 +158,50 @@
       const playCount = orderPosition >= 0 ? orderPosition + 1 : 1;
       
       try {
-        if (!tile._audio) {
-          const a = new Audio("cat.mp3");
-          a.preload = "auto";
-          tile._audio = a;
-        }
-        tile._audio.playbackRate = 2.0; // 2x faster
-        tile._audio.currentTime = 0;
-        
+        // For mobile reliability, create fresh Audio instances for each play sequence
+        // and use the 'ended' event instead of setTimeout
         let currentPlay = 0;
+        let currentAudio = null;
+        
         const playNext = () => {
-          if (currentPlay < playCount) {
-            tile._audio.currentTime = 0;
-            const p = tile._audio.play();
-            if (p && typeof p.catch === "function") {
-              p.catch(() => beepBeep(tile.freq));
-            }
+          if (currentPlay >= playCount) return;
+          
+          // Create a new Audio instance for each play to avoid mobile caching issues
+          currentAudio = new Audio("cat.mp3");
+          currentAudio.preload = "auto";
+          currentAudio.playbackRate = 2.0; // 2x faster
+          
+          // Use ended event for reliable sequencing on mobile
+          currentAudio.addEventListener("ended", () => {
             currentPlay++;
             if (currentPlay < playCount) {
-              setTimeout(playNext, 250); // slight delay between plays
+              playNext();
             }
+          }, { once: true });
+          
+          // Also handle errors
+          currentAudio.addEventListener("error", () => {
+            beepBeep(tile.freq);
+            currentPlay++;
+            if (currentPlay < playCount) {
+              playNext();
+            }
+          }, { once: true });
+          
+          const p = currentAudio.play();
+          if (p && typeof p.catch === "function") {
+            p.catch(() => {
+              beepBeep(tile.freq);
+              currentPlay++;
+              if (currentPlay < playCount) {
+                playNext();
+              }
+            });
           }
         };
+        
+        // Ensure AudioContext is active (required for mobile)
+        getAudio();
         playNext();
       } catch {
         beepBeep(tile.freq);

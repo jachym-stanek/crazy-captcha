@@ -111,8 +111,25 @@
     boneca: "boneca.mp3"
   };
 
+  // Track currently playing audio to stop it when a new tile is clicked
+  let currentlyPlayingAudio = null;
+
+  // Stop any currently playing tile sound
+  function stopCurrentSound() {
+    if (currentlyPlayingAudio) {
+      try {
+        currentlyPlayingAudio.pause();
+        currentlyPlayingAudio.currentTime = 0;
+      } catch {}
+      currentlyPlayingAudio = null;
+    }
+  }
+
   // Try to play a real audio file first (better on mobile), fall back to synthesis.
   function playSound(tile) {
+    // Stop any currently playing sound first
+    stopCurrentSound();
+
     const fn = sounds[tile.soundKey] || sounds.cat;
 
     const url = tile.soundUrl || SOUND_URLS[tile.soundKey] || "";
@@ -128,6 +145,7 @@
         tile._audio = a;
       }
       tile._audio.currentTime = 0;
+      currentlyPlayingAudio = tile._audio;
       const p = tile._audio.play();
       if (p && typeof p.catch === "function") p.catch(() => fn());
     } catch {
