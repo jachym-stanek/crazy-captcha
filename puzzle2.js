@@ -159,7 +159,6 @@
       
       try {
         // For mobile reliability, create fresh Audio instances for each play sequence
-        // and use the 'ended' event instead of setTimeout
         let currentPlay = 0;
         let currentAudio = null;
         
@@ -169,33 +168,24 @@
           // Create a new Audio instance for each play to avoid mobile caching issues
           currentAudio = new Audio("cat.mp3");
           currentAudio.preload = "auto";
-          currentAudio.playbackRate = 2.0; // 2x faster
+          currentAudio.playbackRate = 4.0; // 4x faster
           
-          // Use ended event for reliable sequencing on mobile
-          currentAudio.addEventListener("ended", () => {
-            currentPlay++;
-            if (currentPlay < playCount) {
-              playNext();
-            }
-          }, { once: true });
+          currentPlay++;
+          
+          // Start next sound after a short delay (halved gap between plays)
+          if (currentPlay < playCount) {
+            setTimeout(playNext, 125); // Short delay for rapid succession
+          }
           
           // Also handle errors
           currentAudio.addEventListener("error", () => {
             beepBeep(tile.freq);
-            currentPlay++;
-            if (currentPlay < playCount) {
-              playNext();
-            }
           }, { once: true });
           
           const p = currentAudio.play();
           if (p && typeof p.catch === "function") {
             p.catch(() => {
               beepBeep(tile.freq);
-              currentPlay++;
-              if (currentPlay < playCount) {
-                playNext();
-              }
             });
           }
         };
